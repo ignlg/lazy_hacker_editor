@@ -1,0 +1,12 @@
+[package]
+name = "lazy_hacker_editor"
+version = "0.1.0"
+authors = ["Ignacio Lago <ignacio@ignaciolago.com>"]
+edition = "2018"
+
+[dependencies]
+pancurses = "0.16"
+
+[[bin]]
+name = "lhe"
+path = "src/main.rs"
