@@ -27,13 +27,23 @@ Exit with `^C`. I hope you know what this means, _"""hacker"""._
 - [x] write a char on key down
 - [x] ignore ESC
 
-### TODO
+### v0.5.0
 
-- [ ] param --version
-- [ ] param to setup chars per stroke: --cps N
+- [x] read from multiple files
+- [x] detect term resize
+- [x] opt `-V, --version`
+- [x] opt `-h, --help`
+- [x] opt chars per stroke `-c, --cps N`
+- [x] opt color `--color`
+- [x] rudimentary code highlight (common symbols)
+- [x] opt highlight `-l, --highlight`
+- [x] opt highlight color `--hcolor`
+
+### Backlog
+
 - [ ] param to setup line per stroke: --lps
-- [ ] param help: --help
-- [ ] rudimentary code highlight (common symbols)
+- [ ] add gif to README
+- [ ] add a logo
 
 ## License
 
