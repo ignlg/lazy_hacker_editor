@@ -6,6 +6,7 @@ use pancurses::{
 use std::fs::{read_to_string, File};
 use std::io::{BufRead, BufReader, Lines};
 use std::path::PathBuf;
+use std::process::exit;
 use structopt::StructOpt;
 
 // Lazy Hacker Editor
@@ -172,6 +173,12 @@ fn main() {
     let opt = Opt::from_args();
     // init screen
     let window = init_window(&opt);
+    // set ^C handler
+    ctrlc::set_handler(move || {
+        endwin();
+        exit(0);
+    })
+    .expect("Error setting Ctrl-C handler");
     // files loop
     let mut file_idx = 0;
     let mut read_success = false;
@@ -200,6 +207,6 @@ fn main() {
             file_idx += 1;
         }
     }
-    // end ncurses window
+    // end ncurses window, if no file is read
     endwin();
 }
