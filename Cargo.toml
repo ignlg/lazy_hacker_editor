@@ -1,6 +1,6 @@
 [package]
 name = "lazy_hacker_editor"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Ignacio Lago <ignacio@ignaciolago.com>"]
 edition = "2018"
 
