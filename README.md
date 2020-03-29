@@ -64,9 +64,14 @@ Exit with `^C`. I hope you know what this means, _"""hacker"""._
 - [x] opt highlight `-l, --highlight`
 - [x] opt highlight color `--hcolor`
 
+### v0.6.0
+
+- [x] opt use line per stroke: `--lps`
+- [x] control read errors
+- [x] control Ctrl+C clean exit
+
 ### Backlog
 
-- [ ] opt to setup line per stroke: --lps
 - [ ] add gif to README
 - [ ] add a logo
 - [ ] get rid of ncurses?
