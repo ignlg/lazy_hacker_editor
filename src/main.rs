@@ -3,7 +3,8 @@ use pancurses::{
     A_BOLD, A_NORMAL, COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN, COLOR_MAGENTA, COLOR_PAIR,
     COLOR_RED, COLOR_WHITE, COLOR_YELLOW,
 };
-use std::fs;
+use std::fs::{read_to_string, File};
+use std::io::{BufRead, BufReader, Lines};
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -34,9 +35,10 @@ struct Opt {
     #[structopt(long, default_value = "2")]
     color: usize,
 
-    // TODO: Activate line per keypress, ignores -c, --cps
-    // #[structopt(short, long)]
-    // lps: bool,
+    /// Activate line per keypress, ignores -c, --cps
+    #[structopt(long)]
+    lps: bool,
+
     /// Highlight some common code characters
     #[structopt(short = "l", long)]
     highlight: bool,
@@ -66,8 +68,8 @@ const COLOR_TABLE: [i16; 8] = [
     COLOR_WHITE,
 ];
 
-const COLOR_TEXT: u32 = 0;
-const COLOR_HIGHLIGHT: u32 = 1;
+const COLOR_TEXT: u32 = 1;
+const COLOR_HIGHLIGHT: u32 = 2;
 
 /// Initializes pancurses window
 fn init_window(opt: &Opt) -> Window {
@@ -110,7 +112,7 @@ fn add_text(slice: &str, window: &Window, highlight: bool) {
 }
 
 /// Reads a keypress and writes code on a loop
-fn lazy_editor(buffer: &str, window: &Window, opt: &Opt) {
+fn lazy_editor_by_chars(buffer: &str, window: &Window, opt: &Opt) {
     let len = buffer.len();
     if len > 0 {
         let mut i: usize = 0;
@@ -126,7 +128,7 @@ fn lazy_editor(buffer: &str, window: &Window, opt: &Opt) {
                     }
                     _ => {}
                 };
-                // detect and get indentation
+                // detect end of line and continue until end of next indentation
                 if &buffer[i..n] == "\n" {
                     while (n + 1) <= len && [" ", "\r", "\t"].contains(&&buffer[n..(n + 1)]) {
                         n += 1;
@@ -145,6 +147,26 @@ fn lazy_editor(buffer: &str, window: &Window, opt: &Opt) {
     }
 }
 
+fn lazy_editor_by_lines(lines: Lines<BufReader<File>>, window: &Window, opt: &Opt) {
+    for line in lines {
+        if let Ok(mut line) = line {
+            if let Some(ch) = window.getch() {
+                match ch {
+                    // skip ESC
+                    Input::Character('\u{1b}') => continue,
+                    Input::KeyResize => {
+                        resize_term(0, 0);
+                        continue;
+                    }
+                    _ => {}
+                };
+                line.push_str("\n");
+                add_text(&line, &window, opt.highlight);
+            }
+        }
+    }
+}
+
 fn main() {
     // opts
     let opt = Opt::from_args();
@@ -152,13 +174,31 @@ fn main() {
     let window = init_window(&opt);
     // files loop
     let mut file_idx = 0;
+    let mut read_success = false;
     while file_idx < opt.files.len() {
-        // read file
-        let buffer = fs::read_to_string(&opt.files[file_idx]).unwrap();
-        // consume with lazy editor
-        lazy_editor(&buffer, &window, &opt);
-        // next file
-        file_idx = (file_idx + 1) % opt.files.len();
+        if opt.lps {
+            // read file
+            if let Ok(file) = File::open(&opt.files[file_idx]) {
+                read_success = true;
+                let buffer = BufReader::new(file).lines();
+                // consume with lazy editor
+                lazy_editor_by_lines(buffer, &window, &opt);
+            }
+        } else {
+            // read file
+            if let Ok(buffer) = read_to_string(&opt.files[file_idx]) {
+                read_success = true;
+                // consume with lazy editor
+                lazy_editor_by_chars(&buffer, &window, &opt);
+            }
+        }
+        if read_success {
+            // next file, endless
+            file_idx = (file_idx + 1) % opt.files.len();
+        } else {
+            // next file
+            file_idx += 1;
+        }
     }
     // end ncurses window
     endwin();
