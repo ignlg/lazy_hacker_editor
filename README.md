@@ -22,6 +22,9 @@ FLAGS:
     -l, --highlight
             Highlight some common code characters
 
+        --lps
+            Activate line per keypress, ignores -c, --cps
+
     -V, --version
             Prints version information
 
@@ -48,7 +51,7 @@ lhe -l -c 5 src/main.rs
 
 Exit with `^C`. I hope you know what this means, _"""hacker"""._
 
-## Roadmap
+## Changelog
 
 ### v0.1.0
 
@@ -74,7 +77,11 @@ Exit with `^C`. I hope you know what this means, _"""hacker"""._
 - [x] control read errors
 - [x] control Ctrl+C clean exit
 
-### Backlog
+### v0.6.1
+
+- [x] fix build
+
+## Backlog
 
 - [ ] add gif to README
 - [ ] add a logo
