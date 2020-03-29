@@ -1,4 +1,8 @@
-use pancurses::*;
+use pancurses::{
+    endwin, has_colors, init_pair, initscr, noecho, resize_term, start_color, Input, Window,
+    A_BOLD, A_NORMAL, COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN, COLOR_MAGENTA, COLOR_PAIR,
+    COLOR_RED, COLOR_WHITE, COLOR_YELLOW,
+};
 use std::fs;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -28,7 +32,7 @@ struct Opt {
 
     /// Text color (0-7):
     #[structopt(long, default_value = "2")]
-    color: u32,
+    color: usize,
 
     // TODO: Activate line per keypress, ignores -c, --cps
     // #[structopt(short, long)]
@@ -39,14 +43,14 @@ struct Opt {
 
     /// Highlight color (0-7):
     #[structopt(long, default_value = "7")]
-    hcolor: u32,
+    hcolor: usize,
 
     /// Files to process
     #[structopt(required = true, name = "FILE", parse(from_os_str))]
     files: Vec<PathBuf>,
 }
 
-const HIGHLIGHT: [char; 36] = [
+const HIGHLIGHT_CHARS: [char; 36] = [
     '(', ')', ',', ';', ':', '.', '+', '*', '\'', '"', '-', '=', '{', '}', '[', ']', '~', '/',
     '\\', '&', '?', '<', '>', '|', '`', '!', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 ];
@@ -62,9 +66,11 @@ const COLOR_TABLE: [i16; 8] = [
     COLOR_WHITE,
 ];
 
-fn main() {
-    // opts
-    let opt = Opt::from_args();
+const COLOR_TEXT: u32 = 0;
+const COLOR_HIGHLIGHT: u32 = 1;
+
+/// Initializes pancurses window
+fn init_window(opt: &Opt) -> Window {
     // init screen
     let window = initscr();
     // allow scrolling
@@ -75,62 +81,85 @@ fn main() {
     if has_colors() {
         start_color();
     }
-    for (i, color) in COLOR_TABLE.iter().enumerate() {
-        init_pair(i as i16, *color, COLOR_BLACK);
+    init_pair(COLOR_TEXT as i16, COLOR_TABLE[opt.color % 8], COLOR_BLACK);
+    init_pair(
+        COLOR_HIGHLIGHT as i16,
+        COLOR_TABLE[opt.hcolor % 8],
+        COLOR_BLACK,
+    );
+    window.attrset(COLOR_PAIR(COLOR_TEXT) | A_NORMAL);
+    window
+}
+
+/// Adds text to a pancurses window
+fn add_text(slice: &str, window: &Window, highlight: bool) {
+    if highlight {
+        // char by char, highlighting
+        for c in slice.chars() {
+            if HIGHLIGHT_CHARS.contains(&c) {
+                window.attrset(COLOR_PAIR(COLOR_HIGHLIGHT) | A_BOLD);
+            } else {
+                window.attrset(COLOR_PAIR(COLOR_TEXT) | A_NORMAL);
+            }
+            window.addch(c);
+        }
+    } else {
+        // write the whole slice
+        window.addstr(slice);
     }
-    window.attrset(COLOR_PAIR(opt.color % 8) | A_NORMAL);
-    // go
+}
+
+/// Reads a keypress and writes code on a loop
+fn lazy_editor(buffer: &str, window: &Window, opt: &Opt) {
+    let len = buffer.len();
+    if len > 0 {
+        let mut i: usize = 0;
+        let mut n: usize = opt.cps;
+        while i < len {
+            if let Some(ch) = window.getch() {
+                match ch {
+                    // skip ESC
+                    Input::Character('\u{1b}') => continue,
+                    Input::KeyResize => {
+                        resize_term(0, 0);
+                        continue;
+                    }
+                    _ => {}
+                };
+                // detect and get indentation
+                if &buffer[i..n] == "\n" {
+                    while (n + 1) <= len && [" ", "\r", "\t"].contains(&&buffer[n..(n + 1)]) {
+                        n += 1;
+                    }
+                }
+                add_text(&buffer[i..n], &window, opt.highlight);
+                // advance cursor
+                i = n;
+                if len - i > opt.cps {
+                    n = i + opt.cps;
+                } else {
+                    n = len;
+                }
+            }
+        }
+    }
+}
+
+fn main() {
+    // opts
+    let opt = Opt::from_args();
+    // init screen
+    let window = init_window(&opt);
+    // files loop
     let mut file_idx = 0;
     while file_idx < opt.files.len() {
         // read file
         let buffer = fs::read_to_string(&opt.files[file_idx]).unwrap();
-        let len = buffer.len();
-        if len > 0 {
-            let mut i: usize = 0;
-            let mut n: usize = opt.cps;
-            while i < len {
-                if let Some(ch) = window.getch() {
-                    match ch {
-                        // skip ESC
-                        Input::Character('\u{1b}') => continue,
-                        Input::KeyResize => {
-                            resize_term(0, 0);
-                            continue;
-                        }
-                        _ => {}
-                    };
-                    // detect and get indentation
-                    if &buffer[i..n] == "\n" {
-                        while (n + 1) <= len && [" ", "\r", "\t"].contains(&&buffer[n..(n + 1)]) {
-                            n += 1;
-                        }
-                    }
-                    // highlight
-                    if opt.highlight {
-                        let str_to_add = &buffer[i..n];
-                        for c in str_to_add.chars() {
-                            if HIGHLIGHT.contains(&c) {
-                                window.attrset(COLOR_PAIR(opt.hcolor % 8) | A_BOLD);
-                            } else {
-                                window.attrset(COLOR_PAIR(opt.color % 8) | A_NORMAL);
-                            }
-                            window.addch(c);
-                        }
-                    } else {
-                        // write to screen
-                        window.addstr(&buffer[i..n]);
-                    }
-                    // advance cursor
-                    i = n;
-                    if len - i > opt.cps {
-                        n = i + opt.cps;
-                    } else {
-                        n = len;
-                    }
-                }
-            }
-        }
+        // consume with lazy editor
+        lazy_editor(&buffer, &window, &opt);
+        // next file
         file_idx = (file_idx + 1) % opt.files.len();
     }
+    // end ncurses window
     endwin();
 }
