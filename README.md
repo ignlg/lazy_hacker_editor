@@ -1,6 +1,10 @@
 # Lazy Hacker Editor
 
+[![Build Status](https://travis-ci.org/ignlg/lazy_hacker_editor.svg?branch=master)](https://travis-ci.org/ignlg/lazy_hacker_editor) [![Build status](https://ci.appveyor.com/api/projects/status/wc7p5th4c7onpmo4/branch/master?svg=true)](https://ci.appveyor.com/project/ignlg/lazy-hacker-editor/branch/master)
+
 _Write code already written._
+
+Fake code editor that writes real code, probably yours, no matter which key you stroke.
 
 > Nothing beats the eficiency of writing code already written.
 > _— me, circa 2020_

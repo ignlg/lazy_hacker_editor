@@ -1,8 +1,28 @@
 [package]
 name = "lazy_hacker_editor"
+description = """
+Write code already written. Fake code editor that writes
+real code, probably yours, no matter which key you stroke.
+"""
 version = "0.6.0"
 authors = ["Ignacio Lago <ignacio@ignaciolago.com>"]
 edition = "2018"
+homepage = "https://github.com/ignlg/lazy_hacker_editor"
+repository = "https://github.com/ignlg/lazy_hacker_editor"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-file = "LICENSE.md"
+keywords = [
+  "lazy",
+  "hacker",
+  "editor",
+  "prank",
+  "fun",
+  "funny",
+  "command-line",
+  "command-line-tool",
+  "ncurses",
+]
 
 [dependencies]
 pancurses = "0.16"
