@@ -8,13 +8,38 @@ _Write code already written._
 ## Usage
 
 ```
-lhe {path to file}
+USAGE:
+    lhe [FLAGS] [OPTIONS] <FILE>...
+
+FLAGS:
+    -h, --help
+            Prints help information
+
+    -l, --highlight
+            Highlight some common code characters
+
+    -V, --version
+            Prints version information
+
+OPTIONS:
+        --color <color>
+            Text color (0-7): [default: 2]
+
+    -c, --cps <cps>
+            Set chars per keypress [default: 1]
+
+        --hcolor <hcolor>
+            Highlight color (0-7): [default: 7]
+
+ARGS:
+    <FILE>...
+            Files to process
 ```
 
-Example, in case you need one:
+**Example**
 
 ```
-lhe "src/fancy_code_file.rs"
+lhe -l -c 5 src/main.rs
 ```
 
 Exit with `^C`. I hope you know what this means, _"""hacker"""._
@@ -41,9 +66,10 @@ Exit with `^C`. I hope you know what this means, _"""hacker"""._
 
 ### Backlog
 
-- [ ] param to setup line per stroke: --lps
+- [ ] opt to setup line per stroke: --lps
 - [ ] add gif to README
 - [ ] add a logo
+- [ ] get rid of ncurses?
 
 ## License
 
