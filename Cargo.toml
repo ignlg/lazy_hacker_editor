@@ -8,6 +8,12 @@ edition = "2018"
 pancurses = "0.16"
 structopt = "0.3"
 
+[profile.release]
+debug = false
+lto = true
+codegen-units = 1
+panic = 'abort'
+
 [[bin]]
 name = "lhe"
 path = "src/main.rs"
