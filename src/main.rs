@@ -1,3 +1,4 @@
+use pancurses::chtype;
 use pancurses::{
     endwin, has_colors, init_pair, initscr, noecho, resize_term, start_color, Input, Window,
     A_BOLD, A_NORMAL, COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN, COLOR_MAGENTA, COLOR_PAIR,
@@ -69,8 +70,8 @@ const COLOR_TABLE: [i16; 8] = [
     COLOR_WHITE,
 ];
 
-const COLOR_TEXT: u32 = 1;
-const COLOR_HIGHLIGHT: u32 = 2;
+const COLOR_TEXT: usize = 1;
+const COLOR_HIGHLIGHT: usize = 2;
 
 /// Initializes pancurses window
 fn init_window(opt: &Opt) -> Window {
@@ -90,7 +91,7 @@ fn init_window(opt: &Opt) -> Window {
         COLOR_TABLE[opt.hcolor % 8],
         COLOR_BLACK,
     );
-    window.attrset(COLOR_PAIR(COLOR_TEXT) | A_NORMAL);
+    window.attrset(COLOR_PAIR(COLOR_TEXT as chtype) | A_NORMAL);
     window
 }
 
@@ -100,9 +101,9 @@ fn add_text(slice: &str, window: &Window, highlight: bool) {
         // char by char, highlighting
         for c in slice.chars() {
             if HIGHLIGHT_CHARS.contains(&c) {
-                window.attrset(COLOR_PAIR(COLOR_HIGHLIGHT) | A_BOLD);
+                window.attrset(COLOR_PAIR(COLOR_HIGHLIGHT as chtype) | A_BOLD);
             } else {
-                window.attrset(COLOR_PAIR(COLOR_TEXT) | A_NORMAL);
+                window.attrset(COLOR_PAIR(COLOR_TEXT as chtype) | A_NORMAL);
             }
             window.addch(c);
         }
