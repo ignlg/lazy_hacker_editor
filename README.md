@@ -83,7 +83,7 @@ Exit with `^C`. I hope you know what this means, _"""hacker"""._
 
 ## Backlog
 
-- [ ] add gif to README
+- [x] add gif to README
 - [ ] add a logo
 - [ ] get rid of ncurses?
 
