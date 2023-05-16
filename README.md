@@ -1,6 +1,6 @@
 # Lazy Hacker Editor
 
-[![Build Status](https://travis-ci.org/ignlg/lazy_hacker_editor.svg?branch=master)](https://travis-ci.org/ignlg/lazy_hacker_editor) [![Build status](https://ci.appveyor.com/api/projects/status/wc7p5th4c7onpmo4/branch/master?svg=true)](https://ci.appveyor.com/project/ignlg/lazy-hacker-editor/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/wc7p5th4c7onpmo4/branch/master?svg=true)](https://ci.appveyor.com/project/ignlg/lazy-hacker-editor/branch/master)
 
 Fake code editor that writes real code (hopefully yours, probably from someone else) no matter which key you stroke.
 
@@ -8,6 +8,19 @@ Fake code editor that writes real code (hopefully yours, probably from someone e
 
 ![Lazy Hacker](https://i.imgur.com/rGOX9Ch.gif)
 ![Lazy Editor](https://i.imgur.com/geDSLgQ.gif)
+
+## Installation
+
+### From release files
+
+1. Download a release gzip file from https://github.com/ignlg/lazy_hacker_editor/releases .
+2. Extract it to install the binary, for example: `tar xzf lhe-macos-v0.6.1.tar.gz -C ~/bin`.
+
+### From source
+
+1. Clone the project with `git clone https://github.com/ignlg/lazy_hacker_editor`.
+2. Go to the installation folder, for example: `cd ~/bin`.
+3. Run `cargo install --path SOURCE_PATH`, where `SOURCE_PATH` is the path to the clone you did on the first step.
 
 ## Usage
 
