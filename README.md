@@ -14,13 +14,15 @@ Fake code editor that writes real code (hopefully yours, probably from someone e
 ### From release files
 
 1. Download a release gzip file from https://github.com/ignlg/lazy_hacker_editor/releases .
-2. Extract it to install the binary, for example: `tar xzf lhe-macos-v0.6.1.tar.gz -C ~/bin`.
+2. Extract it to install the binary on any folder of your `$PATH`, for example: `tar xzf lhe-macos-v0.6.1.tar.gz -C ~/bin`.
+3. Done! Run `lhe` to try it.
 
 ### From source
 
 1. Clone the project with `git clone https://github.com/ignlg/lazy_hacker_editor`.
-2. Go to the installation folder, for example: `cd ~/bin`.
-3. Run `cargo install --path SOURCE_PATH`, where `SOURCE_PATH` is the path to the clone you did on the first step.
+2. Go into the folder: `cd lazy_hacker_editor`.
+3. Run `cargo install --path .` and wait for it.
+4. Done! Run `lhe` to try it.
 
 ## Usage
 
